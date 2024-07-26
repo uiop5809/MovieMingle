@@ -4,15 +4,9 @@ import com.spring.movie_mingle.domain.Review;
 import com.spring.movie_mingle.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class ReviewController {
@@ -30,6 +24,19 @@ public class ReviewController {
         return result;
     }
 
+    @GetMapping("/review/detail/{review_id}")
+    @ResponseBody
+    public Map<String, Object> detail(@PathVariable("review_id") int review_id) {
+        Map<String, Object> result = new HashMap<>();
+        Optional<Review> rv = reviewRepo.findById(review_id);
+        if(rv.isPresent()){
+            Review review = rv.get();
+            result.put("code", "ok");
+            result.put("data", review);
+        }
+        return result;
+    }
+
     @PostMapping("/review/regist")
     @ResponseBody
     public Map<String, Object> regist(@RequestBody Review review){
@@ -40,4 +47,5 @@ public class ReviewController {
         result.put("code", "ok");
         return result;
     }
+
 }
