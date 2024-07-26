@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @Controller
+@RequestMapping("review")
 public class ReviewController {
 
     @Autowired
     private ReviewRepository reviewRepo;
 
-    @GetMapping("/review/list")
+    @GetMapping("/list")
     @ResponseBody
     public Map<String, Object> list() {
         Map<String, Object> result = new HashMap<>();
@@ -24,7 +25,7 @@ public class ReviewController {
         return result;
     }
 
-    @GetMapping("/review/detail/{review_id}")
+    @GetMapping("/detail/{review_id}")
     @ResponseBody
     public Map<String, Object> detail(@PathVariable("review_id") int review_id) {
         Map<String, Object> result = new HashMap<>();
@@ -37,12 +38,12 @@ public class ReviewController {
         return result;
     }
 
-    @PostMapping("/review/regist")
+    @PostMapping("/regist")
     @ResponseBody
     public Map<String, Object> regist(@RequestBody Review review){
         Map<String, Object> result = new HashMap<>();
         Date date = new java.util.Date();
-        review.setCreated_at(date);
+        review.setCreatedAt(date);
         reviewRepo.save(review);
         result.put("code", "ok");
         return result;
@@ -52,11 +53,11 @@ public class ReviewController {
     @ResponseBody
     public Map<String, Object> update(@RequestBody Review review) {
         Map<String, Object> result = new HashMap<>();
-        Optional<Review> optionalReview = reviewRepo.findById(review.getReview_id());
+        Optional<Review> optionalReview = reviewRepo.findById(review.getReviewId());
         if (optionalReview.isPresent()) {
             Review existingReview = optionalReview.get();
-            existingReview.setMovie_id(review.getMovie_id());
-            existingReview.setUser_id(review.getUser_id());
+            existingReview.setMovieId(review.getMovieId());
+            existingReview.setMovieId(review.getUserId());
             existingReview.setRating(review.getRating());
             existingReview.setReview(review.getReview());
             reviewRepo.save(existingReview);

@@ -5,7 +5,7 @@
         <title>리뷰들</title>
         <div>
             <h1>리뷰리스트</h1>
-            <div><a href="review-regist.html">리뷰 등록</a></div>
+            <div><a href="/review/regist.html">리뷰 등록</a></div>
             <table>
                 <thead>
                     <tr>
@@ -29,11 +29,11 @@
                 let s = "";
                 for(let d of data.data){
                     s+="<tr>"
-                    s+="<td>"+d.user_id+"</td>"
-                    s+="<td>"+d.movie_id+"</td>"
+                    s+="<td>"+d.userId+"</td>"
+                    s+="<td>"+d.movieId+"</td>"
                     s+="<td>"+d.rating+"</td>"
                     s+=`<td>`+d.review+"</td>"
-                    s+="<td>"+d.created_at+"</td>"
+                    s+="<td>"+d.createdAt+"</td>"
                     s+="</tr>"
                 }
                 $("#bd_body").html(s)

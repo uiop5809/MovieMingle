@@ -7,7 +7,7 @@
 <body>
 <div>
     <h1>리뷰 등록</h1>
-    <div><a href="review.html">리뷰 목록</a></div>
+    <div><a href="/review/list.html">리뷰 목록</a></div>
     <form id="review_form">
         <label for="user_id">리뷰 작성자</label>
         <input type="number" id="user_id" name="user_id" required="required"><br>
@@ -36,7 +36,7 @@
             }),
             success: function(data){
                 if(data.code == "ok"){
-                    location.href = "review.html";
+                    location.href = "/review/list.html";
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {

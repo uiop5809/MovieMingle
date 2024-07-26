@@ -7,7 +7,7 @@
     <body>
     <h1>리뷰 상세보기</h1>
     <div>
-        <a href="/review.html">리뷰 리스트</a>
+        <a href="/review/list.html">리뷰 리스트</a>
     </div>
     <div>
         <div>영화: <span id="movie_id"></span></div>
@@ -17,24 +17,24 @@
         <div>내용: <span id="review"></span></div>
     </div>
     <div>
-        <a href="/review-update.html" id="update">수정하기</a>
+        <a href="/review/update.html" id="update">수정하기</a>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript">
         let url = new URL(location.href);
         let param = url.searchParams;
-        let review_id = param.get("id");
+        let reviewId = param.get("id");
         let href = $("#update").attr("href")
 
-        $("#update").attr("href", href + "?id=" + review_id);
+        $("#update").attr("href", href + "?id=" + reviewId);
         $.ajax({
-            url: "/review/detail/" + review_id,
+            url: "/review/detail/" + reviewId,
             success: function(data){
                 if(data.code === "ok"){
-                    $("#movie_id").html(data.data.movie_id);
-                    $("#user_id").html(data.data.user_id);
+                    $("#movie_id").html(data.data.movieId);
+                    $("#user_id").html(data.data.userId);
                     $("#rating").html(data.data.rating);
-                    $("#created_at").html(data.data.created_at);
+                    $("#created_at").html(data.data.createdAt);
                     $("#review").html(data.data.review);
                 } else {
                     console.error("Failed to load review details");

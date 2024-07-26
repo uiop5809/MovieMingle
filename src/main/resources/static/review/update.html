@@ -60,7 +60,7 @@
             success: function(data){
                 if(data.code === "ok"){
                     alert("수정되었습니다.");
-                    location.href = "/review-detail.html?id=" + review_id;
+                    location.href = "/review/detail.html?id=" + review_id;
                 } else {
                     console.error("Failed to update review");
                 }

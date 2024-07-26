@@ -14,13 +14,13 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int review_id;
+    private int reviewId;
 
     @Column(nullable = false)
-    private int user_id;
+    private int userId;
 
     @Column(nullable = false)
-    private int movie_id;
+    private int movieId;
 
     @Column(nullable = false)
     private int rating;
@@ -28,9 +28,23 @@ public class Review {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String review;
 
-    @Column(nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Date created_at;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    private Date createdAt;
 
-    @Column(nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private Date updated_at;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private Date updatedAt;
+
+    // db에 처음 저장되거나 업데이트 될 때 날짜와 시간 자동 설정
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+        updatedAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -14,13 +15,14 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserRepository userRepo;
 
     // 로그인
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     @ResponseBody
     public Map<String, Object> login(
             @RequestParam("id") String id,
@@ -47,7 +49,7 @@ public class UserController {
     }
 
     // 회원가입
-    @PostMapping("/user/signup")
+    @PostMapping("/signup")
     @ResponseBody
     public Map<String, Object> signup(
             @RequestParam("id") String id,
