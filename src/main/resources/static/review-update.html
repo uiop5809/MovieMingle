@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 수정</title>
+</head>
+<body>
+<h1>리뷰 수정</h1>
+<div>
+    <form id="update_form">
+        <input type="hidden" id="review_id" name="review_id">
+        <label for="movie_id">영화 ID:</label>
+        <input type="number" id="movie_id" name="movie_id" required><br>
+        <label for="user_id">작성자:</label>
+        <input type="number" id="user_id" name="user_id" required><br>
+        <label for="rating">평점:</label>
+        <input type="number" id="rating" name="rating" required min="0" max="10"><br>
+        <label for="review">내용:</label>
+        <textarea id="review" name="review" rows="5" cols="60" required></textarea><br>
+        <input type="submit" value="수정하기">
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+    let url = new URL(location.href);
+    let param = url.searchParams;
+    let review_id = param.get("id");
+
+    $.ajax({
+        url: "/review/detail/" + review_id,
+        success: function(data){
+            if(data.code === "ok"){
+                $("#review_id").val(data.data.review_id);
+                $("#movie_id").val(data.data.movie_id);
+                $("#user_id").val(data.data.user_id);
+                $("#rating").val(data.data.rating);
+                $("#review").val(data.data.review);
+            } else {
+                console.error("Failed to load review details");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Error: " + textStatus + ", " + errorThrown);
+        }
+    });
+
+    $("#update_form").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "/review/update",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                review_id: $("#review_id").val(),
+                movie_id: $("#movie_id").val(),
+                user_id: $("#user_id").val(),
+                rating: $("#rating").val(),
+                review: $("#review").val()
+            }),
+            success: function(data){
+                if(data.code === "ok"){
+                    alert("수정되었습니다.");
+                    location.href = "/review-detail.html?id=" + review_id;
+                } else {
+                    console.error("Failed to update review");
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error: " + textStatus + ", " + errorThrown);
+            }
+        });
+    });
+</script>
+</body>
+</html>

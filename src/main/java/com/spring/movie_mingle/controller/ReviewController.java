@@ -48,4 +48,24 @@ public class ReviewController {
         return result;
     }
 
+    @PostMapping("/review/update")
+    @ResponseBody
+    public Map<String, Object> update(@RequestBody Review review) {
+        Map<String, Object> result = new HashMap<>();
+        Optional<Review> optionalReview = reviewRepo.findById(review.getReview_id());
+        if (optionalReview.isPresent()) {
+            Review existingReview = optionalReview.get();
+            existingReview.setMovie_id(review.getMovie_id());
+            existingReview.setUser_id(review.getUser_id());
+            existingReview.setRating(review.getRating());
+            existingReview.setReview(review.getReview());
+            reviewRepo.save(existingReview);
+            result.put("code", "ok");
+        } else {
+            result.put("code", "error");
+            result.put("message", "Review not found");
+        }
+        return result;
+    }
+
 }
