@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이번주 Box Office</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<h1>Weekly Box Office</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Rank</th>
+        <th>Movie Name</th>
+        <th>Open Date</th>
+        <th>Sales Amount</th>
+        <th>Audience Count</th>
+        <th>Screen Count</th>
+        <th>Show Count</th>
+    </tr>
+    </thead>
+    <tbody id="movieTableBody">
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // 페이지 로드 시 주간 박스오피스 데이터 가져오기
+        fetchData();
+
+        // 데이터 가져오는 함수
+        function fetchData() {
+            $.ajax({
+                url: '/movies/weekly',
+                method: 'GET',
+                success: function(data) {
+                    console.log(data); // 데이터가 올바르게 전달되는지 확인
+                    var tbody = $('#movieTableBody');
+                    tbody.empty();
+                    if (data && data.length > 0) {
+                        $.each(data, function(index, movie) {
+                            var row = $('<tr>');
+                            row.append($('<td>').text(index + 1));
+                            row.append($('<td>').text(movie.movieNm));
+                            row.append($('<td>').text(movie.openDt));
+                            row.append($('<td>').text(movie.salesAmt));
+                            row.append($('<td>').text(movie.audiCnt));
+                            row.append($('<td>').text(movie.scrnCnt));
+                            row.append($('<td>').text(movie.showCnt));
+                            tbody.append(row);
+                        });
+                    } else {
+                        var row = $('<tr>');
+                        row.append($('<td colspan="7">').text('No data available for the selected date.'));
+                        tbody.append(row);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', status, error);
+                    alert('Failed to fetch data. Please try again later.');
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
