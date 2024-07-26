@@ -59,11 +59,9 @@
 <body>
 <div class="navbar">
     <a href="/user/login.html">로그인</a>
-    <a href="/review/regist.html">리뷰 작성</a>
-    <a href="/review/list.html">리뷰 리스트</a>
 </div>
 <h1>MovieMingle</h1>
-<p>영화 덕후들의 핫플! 같이 보고, 같이 떠들고, 같이 즐기자!</p>
+<p>영화와 함께하는 소셜 네트워킹, MovieMingle에서 시작해요!</p>
 <div class="movie-grid" id="movieGrid">
 </div>
 
@@ -98,6 +96,18 @@
                         $('.movie-card').click(function() {
                             var movieId = $(this).attr('data-id');
                             window.location.href = '/review/list.html?movieId=' + movieId;
+                        });
+
+                        // 리뷰 등록 링크에 movieId 추가
+                        $('.navbar a[href="/review/regist.html"]').click(function(e) {
+                            e.preventDefault();
+                            var urlParams = new URLSearchParams(window.location.search);
+                            var movieId = urlParams.get('movieId');
+                            if (movieId) {
+                                window.location.href = '/review/regist.html?movieId=' + movieId;
+                            } else {
+                                window.location.href = '/review/regist.html';
+                            }
                         });
                     } else {
                         var message = $('<p>').text('No data available.');

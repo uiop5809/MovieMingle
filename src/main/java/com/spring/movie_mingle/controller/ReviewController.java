@@ -38,7 +38,7 @@ public class ReviewController {
         return result;
     }
 
-    @PostMapping("/regist")
+    @PostMapping("/write")
     @ResponseBody
     public Map<String, Object> regist(@RequestBody Review review){
         Map<String, Object> result = new HashMap<>();
@@ -49,7 +49,7 @@ public class ReviewController {
         return result;
     }
 
-    @PostMapping("/review/update")
+    @PostMapping("/update")
     @ResponseBody
     public Map<String, Object> update(@RequestBody Review review) {
         Map<String, Object> result = new HashMap<>();
