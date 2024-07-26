@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>리뷰들</title>
+        <div>
+            <h1>리뷰리스트</h1>
+            <div><a href="reg.html">리뷰 등록</a></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>생성자</th>
+                        <th>영화</th>
+                        <th>평점</th>
+                        <th>리뷰</th>
+                        <th>생성일</th>
+                    </tr>
+                </thead>
+                <tbody id="bd_body"></tbody>
+            </table>
+        </div>
+    </head>
+    <body>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
+        <script type="text/javascript">
+            $.ajax({
+            url:"/review/list",
+            success:function(data){
+                let s = "";
+                for(let d of data.data){
+                    s+="<tr>"
+                    s+="<td>"+d.user_id+"</td>"
+                    s+="<td>"+d.movie_id+"</td>"
+                    s+="<td>"+d.rating+"</td>"
+                    s+=`<td>`+d.review+"</td>"
+                    s+="<td>"+d.created_at+"</td>"
+                    s+="</tr>"
+                }
+                $("#bd_body").html(s)
+            }
+        })
+        </script>
+    </body>
+</html>
