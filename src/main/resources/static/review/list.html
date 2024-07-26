@@ -1,44 +1,131 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>리뷰들</title>
-        <div>
-            <h1>리뷰리스트</h1>
-            <div><a href="/review/regist.html">리뷰 등록</a></div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>생성자</th>
-                        <th>영화</th>
-                        <th>평점</th>
-                        <th>리뷰</th>
-                        <th>생성일</th>
-                    </tr>
-                </thead>
-                <tbody id="bd_body"></tbody>
-            </table>
-        </div>
-    </head>
-    <body>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js" ></script>
-        <script type="text/javascript">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰들</title>
+    <style>
+        body {
+            margin: 0 10rem; /* 양쪽 마진 설정 */
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #f0f0f0;
+        }
+        .movie-info {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .movie-info img {
+            width: 150px;
+            height: auto;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="/review/regist.html">리뷰 등록</a>
+</div>
+<h1>리뷰 리스트</h1>
+<div id="movieInfo" class="movie-info"></div>
+<table>
+    <thead>
+    <tr>
+        <th>생성자</th>
+        <th>영화</th>
+        <th>평점</th>
+        <th>리뷰</th>
+        <th>생성일</th>
+    </tr>
+    </thead>
+    <tbody id="bd_body"></tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var movieId = urlParams.get('movieId');
+
+        if (movieId) {
+            // 영화 정보 가져오기
             $.ajax({
-            url:"/review/list",
-            success:function(data){
-                let s = "";
-                for(let d of data.data){
-                    s+="<tr>"
-                    s+="<td>"+d.userId+"</td>"
-                    s+="<td>"+d.movieId+"</td>"
-                    s+="<td>"+d.rating+"</td>"
-                    s+=`<td>`+d.review+"</td>"
-                    s+="<td>"+d.createdAt+"</td>"
-                    s+="</tr>"
+                url: '/movies/' + movieId,
+                method: 'GET',
+                success: function(movie) {
+                    var movieInfo = $('#movieInfo');
+                    var posterUrl = movie.posterUrl ? '<img src="' + movie.posterUrl + '" alt="' + movie.title + '">' : 'No image available';
+                    movieInfo.append($(posterUrl));
+                    movieInfo.append($('<div>').append(
+                        $('<h2>').text(movie.title),
+                        $('<p>').text('개봉일: ' + movie.releaseDate),
+                        $('<p>').text('평점: ' + movie.voteAverage),
+                        $('<p>').text(movie.overview)
+                    ));
+                },
+                error: function(xhr, status, error) {
+                    console.error("영화 정보 요청 중 오류 발생:", status, error);
+                    alert("영화 정보 요청 중 오류가 발생했습니다.");
                 }
-                $("#bd_body").html(s)
-            }
-        })
-        </script>
-    </body>
+            });
+
+            // 리뷰 목록 가져오기
+            $.ajax({
+                url: '/review/list',
+                method: 'GET',
+                data: { movieId: movieId },
+                success: function(data) {
+                    let s = "";
+                    for (let d of data.data) {
+                        s += "<tr>"
+                        s += "<td>" + d.userId + "</td>"
+                        s += "<td>" + d.movieId + "</td>"
+                        s += "<td>" + d.rating + "</td>"
+                        s += "<td>" + d.review + "</td>"
+                        s += "<td>" + d.createdAt + "</td>"
+                        s += "</tr>"
+                    }
+                    $("#bd_body").html(s)
+                },
+                error: function(xhr, status, error) {
+                    console.error("리뷰 요청 중 오류 발생:", status, error);
+                    alert("리뷰 요청 중 오류가 발생했습니다.");
+                }
+            });
+        } else {
+            $("#bd_body").html("<tr><td colspan='5'>No movie selected.</td></tr>");
+        }
+    });
+</script>
+</body>
 </html>

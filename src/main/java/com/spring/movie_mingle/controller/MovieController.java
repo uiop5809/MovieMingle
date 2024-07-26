@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class MovieController {
@@ -40,7 +42,13 @@ public class MovieController {
 
             movieRepository.save(movie);
         }
-
         return ResponseEntity.ok(movieRepository.findAll());
+    }
+
+    @GetMapping("/movies/{id}")
+    @ResponseBody
+    public ResponseEntity<Movie> getMovieById(@PathVariable Long id) {
+        Optional<Movie> movie = movieRepository.findById(id);
+        return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

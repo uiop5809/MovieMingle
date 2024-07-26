@@ -39,6 +39,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin: 10px; /* 카드 간격 추가 */
+            cursor: pointer; /* 클릭 가능하도록 커서 변경 */
         }
         .movie-card img {
             width: 100%;
@@ -82,7 +83,7 @@
                     grid.empty();
                     if (data && data.length > 0) {
                         $.each(data, function(index, movie) {
-                            var card = $('<div class="movie-card">');
+                            var card = $('<div class="movie-card">').attr('data-id', movie.id);
                             var posterUrl = movie.posterUrl ? '<img src="' + movie.posterUrl + '" alt="' + movie.title + '">' : 'No image available';
                             card.append($(posterUrl));
                             card.append($('<h3>').text(movie.title));
@@ -91,6 +92,12 @@
                             var overviewText = movie.overview.length > 100 ? movie.overview.substring(0, 100) + '...' : movie.overview;
                             card.append($('<p class="overview">').text(overviewText));
                             grid.append(card);
+                        });
+
+                        // 영화 카드 클릭 이벤트
+                        $('.movie-card').click(function() {
+                            var movieId = $(this).attr('data-id');
+                            window.location.href = '/review/list.html?movieId=' + movieId;
                         });
                     } else {
                         var message = $('<p>').text('No data available.');
