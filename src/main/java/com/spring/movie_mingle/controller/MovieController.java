@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -20,36 +18,26 @@ public class MovieController {
     @Autowired
     private MovieRepository movieRepository;
 
-    private final String API_KEY = "2f41c6f48c1feee4ef28cc0ef3f0e998";
-    private final String API_URL = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json";
+    private final String TMDB_API_KEY = "0e1a71e289465f90209535b3a6039dc2";
+    private final String TMDB_API_URL = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=ko-KR&page=1&sort_by=popularity.desc&api_key=" + TMDB_API_KEY;
 
-    @GetMapping("/movies/weekly")
+    @GetMapping("/movies/popular")
     @ResponseBody
-    public ResponseEntity<List<Movie>> getWeeklyBoxOffice() {
+    public ResponseEntity<List<Movie>> getPopularMovies() {
         RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> response = restTemplate.getForObject(TMDB_API_URL, Map.class);
 
-        LocalDate today = LocalDate.now();
-        LocalDate thisMonday = today.with(java.time.DayOfWeek.MONDAY);
-        String targetDt = thisMonday.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-        String url = String.format("%s?key=%s&targetDt=%s&weekGb=0", API_URL, API_KEY, targetDt);
         @SuppressWarnings("unchecked")
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-        Map<String, Object> boxOfficeResult = (Map<String, Object>) response.get("boxOfficeResult");
-        List<Map<String, Object>> weeklyBoxOfficeList = (List<Map<String, Object>>) boxOfficeResult.get("weeklyBoxOfficeList");
+        List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
 
-        for (Map<String, Object> movieData : weeklyBoxOfficeList) {
+        for (Map<String, Object> movieData : results) {
             Movie movie = new Movie();
-            movie.setMovieCd((String) movieData.get("movieCd"));
-            movie.setMovieNm((String) movieData.get("movieNm"));
-            movie.setOpenDt((String) movieData.get("openDt"));
-            movie.setSalesAmt(Long.parseLong((String) movieData.get("salesAmt")));
-            movie.setSalesShare(Double.parseDouble((String) movieData.get("salesShare")));
-            movie.setSalesAcc(Long.parseLong((String) movieData.get("salesAcc")));
-            movie.setAudiCnt(Integer.parseInt((String) movieData.get("audiCnt")));
-            movie.setAudiAcc(Integer.parseInt((String) movieData.get("audiAcc")));
-            movie.setScrnCnt(Integer.parseInt((String) movieData.get("scrnCnt")));
-            movie.setShowCnt(Integer.parseInt((String) movieData.get("showCnt")));
+            movie.setTitle((String) movieData.get("title"));
+            movie.setPosterUrl("https://image.tmdb.org/t/p/w500" + (String) movieData.get("poster_path"));
+            movie.setOverview((String) movieData.get("overview"));
+            movie.setVoteAverage(Double.parseDouble(movieData.get("vote_average").toString()));
+            movie.setReleaseDate((String) movieData.get("release_date"));
+
             movieRepository.save(movie);
         }
 
