@@ -19,7 +19,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepo;
 
-    // 로그인기능
+    // 로그인
     @PostMapping("/user/login")
     @ResponseBody
     public Map<String, Object> login(
@@ -41,6 +41,35 @@ public class UserController {
             }
         } else {
             result.put("message", "없거나 삭제된 id");
+        }
+        System.out.println(result);
+        return result;
+    }
+
+    // 회원가입
+    @PostMapping("/user/signup")
+    @ResponseBody
+    public Map<String, Object> signup(
+            @RequestParam("id") String id,
+            @RequestParam("password") String password,
+            @RequestParam("name") String name) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code", "error");
+
+        // 아이디 중복 확인
+        Optional<User> existingUser = userRepo.findById(id);
+        if (existingUser.isPresent()) {
+            result.put("message", "이미 존재하는 아이디");
+        } else {
+            // 새로운 사용자 생성 및 저장
+            User newUser = new User();
+            newUser.setId(id);
+            newUser.setPassword(password);
+            newUser.setName(name);
+            userRepo.save(newUser);
+
+            result.put("code", "ok");
+            result.put("message", "회원가입 성공");
         }
         System.out.println(result);
         return result;
