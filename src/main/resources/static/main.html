@@ -3,24 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Popular Movies</title>
+    <title>MovieMingle</title>
+    <style>
+        body {
+            margin: 0 10rem; /* 양쪽 마진 설정 */
+        }
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #f0f0f0;
+        }
+        .movie-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem; /* 사진들 간격 추가 */
+            justify-content: center; /* 가운데 정렬 */
+        }
+        .movie-card {
+            flex: 1 1 calc(16.66% - 40px); /* 1행에 6개 */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 10px; /* 카드 간격 추가 */
+        }
+        .movie-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .movie-card p.overview {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* 라인 수 */
+            -webkit-box-orient: vertical;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-<h1>Popular Movies</h1>
-<table border="1">
-    <thead>
-    <tr>
-        <th>제목</th>
-        <th>개봉일</th>
-        <th>평점</th>
-        <th>Poster</th>
-        <th>소개</th>
-    </tr>
-    </thead>
-    <tbody id="movieTableBody">
-    </tbody>
-</table>
+<div class="navbar">
+    <a href="/user/login.html">로그인</a>
+    <a href="/review/regist.html">리뷰 작성</a>
+    <a href="/review/list.html">리뷰 리스트</a>
+</div>
+<h1>MovieMingle</h1>
+<p>영화 덕후들의 핫플! 같이 보고, 같이 떠들고, 같이 즐기자!</p>
+<div class="movie-grid" id="movieGrid">
+</div>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -34,23 +78,23 @@
                 method: 'GET',
                 success: function(data) {
                     console.log(data); // 데이터가 올바르게 전달되는지 확인
-                    var tbody = $('#movieTableBody');
-                    tbody.empty();
+                    var grid = $('#movieGrid');
+                    grid.empty();
                     if (data && data.length > 0) {
                         $.each(data, function(index, movie) {
-                            var row = $('<tr>');
-                            row.append($('<td>').text(movie.title));
-                            row.append($('<td>').text(movie.releaseDate));
-                            row.append($('<td>').text(movie.voteAverage));
-                            var posterUrl = movie.posterUrl ? '<img src="' + movie.posterUrl + '" alt="' + movie.title + '" width="100">' : 'No image available';
-                            row.append($('<td>').html(posterUrl));
-                            row.append($('<td>').text(movie.overview));
-                            tbody.append(row);
+                            var card = $('<div class="movie-card">');
+                            var posterUrl = movie.posterUrl ? '<img src="' + movie.posterUrl + '" alt="' + movie.title + '">' : 'No image available';
+                            card.append($(posterUrl));
+                            card.append($('<h3>').text(movie.title));
+                            card.append($('<p>').text('개봉일: ' + movie.releaseDate));
+                            card.append($('<p>').text('평점: ' + movie.voteAverage));
+                            var overviewText = movie.overview.length > 100 ? movie.overview.substring(0, 100) + '...' : movie.overview;
+                            card.append($('<p class="overview">').text(overviewText));
+                            grid.append(card);
                         });
                     } else {
-                        var row = $('<tr>');
-                        row.append($('<td colspan="5">').text('No data available.'));
-                        tbody.append(row);
+                        var message = $('<p>').text('No data available.');
+                        grid.append(message);
                     }
                 },
                 error: function(xhr, status, error) {
