@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>리뷰들</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             margin: 0 10rem; /* 양쪽 마진 설정 */
@@ -11,8 +12,8 @@
         }
         .navbar {
             display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
+            justify-content: space-between; /* 양 끝 정렬 */
+            align-items: center;
             margin: 1rem 0;
         }
         .navbar a {
@@ -26,50 +27,52 @@
         .navbar a:hover {
             background-color: #f0f0f0;
         }
+        .navbar .back-button {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .back-button i {
+            margin-right: 0.5rem;
+        }
         .movie-info {
             display: flex;
             align-items: center;
             margin-top: 1rem;
         }
         .movie-info img {
-            width: 150px;
+            width: 300px; /* 영화 포스터 크기 증가 */
             height: auto;
             border-radius: 8px;
             margin-right: 1rem;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+        .review-container {
+            margin-top: 2rem;
         }
-        th, td {
-            padding: 0.5rem;
+        .review {
             border: 1px solid #ddd;
-            text-align: left;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        th {
-            background-color: #f4f4f4;
+        .review .rating {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .review .created-at {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
 <div class="navbar">
-    <a href="/review/regist.html">리뷰 등록</a>
+    <a href="/main.html" class="back-button"><i class="fas fa-arrow-left"></i>뒤로 가기</a>
+    <a id="writeReviewButton" href="#">리뷰 등록</a>
 </div>
-<h1>리뷰 리스트</h1>
 <div id="movieInfo" class="movie-info"></div>
-<table>
-    <thead>
-    <tr>
-        <th>생성자</th>
-        <th>영화</th>
-        <th>평점</th>
-        <th>리뷰</th>
-        <th>생성일</th>
-    </tr>
-    </thead>
-    <tbody id="bd_body"></tbody>
-</table>
+<div id="reviewContainer" class="review-container"></div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script type="text/javascript">
@@ -106,24 +109,33 @@
                 data: { movieId: movieId },
                 success: function(data) {
                     let s = "";
-                    for (let d of data.data) {
-                        s += "<tr>"
-                        s += "<td>" + d.userId + "</td>"
-                        s += "<td>" + d.movieId + "</td>"
-                        s += "<td>" + d.rating + "</td>"
-                        s += "<td>" + d.review + "</td>"
-                        s += "<td>" + d.createdAt + "</td>"
-                        s += "</tr>"
+                    if (data.data) {
+                        data.data.forEach(d => {
+                            if (d.movieId == movieId) {
+                                let date = new Date(d.createdAt);
+                                let formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 ' + date.getHours() + '시 ' + date.getMinutes() + '분';
+                                s += '<div class="review">';
+                                s += '<div class="rating">평점: ' + d.rating + '</div>';
+                                s += '<div class="review-text">' + d.review + '</div>';
+                                s += '<div class="created-at">' + formattedDate + '</div>';
+                                s += '</div>';
+                            }
+                        });
+                    } else {
+                        s = "<p>No reviews found.</p>";
                     }
-                    $("#bd_body").html(s)
+                    $("#reviewContainer").html(s);
                 },
                 error: function(xhr, status, error) {
                     console.error("리뷰 요청 중 오류 발생:", status, error);
                     alert("리뷰 요청 중 오류가 발생했습니다.");
                 }
             });
+
+            // 리뷰 등록 페이지로 이동할 때 movieId를 URL에 포함
+            $('#writeReviewButton').attr('href', '/review/write.html?movieId=' + movieId);
         } else {
-            $("#bd_body").html("<tr><td colspan='5'>No movie selected.</td></tr>");
+            $("#reviewContainer").html("<p>No movie selected.</p>");
         }
     });
 </script>
