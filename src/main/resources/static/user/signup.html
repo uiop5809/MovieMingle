@@ -45,7 +45,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>회원가입 화면</h1>
+    <h1>회원가입</h1>
     <form id="signup_form" action="/user/signup" method="post">
         <input type="text" id="id" name="id" placeholder="아이디"> <br>
         <input type="password" id="password" name="password" placeholder="비밀번호"> <br>
@@ -63,7 +63,7 @@
             data: $("#signup_form").serialize(),
             success: function(data) {
                 alert(data.code + ", " + data.message);
-                location.href = "review.html";
+                location.href = "/login.html";
             },
             error: function(xhr, status, error) {
                 console.error("회원가입 요청 중 오류 발생:", status, error);

@@ -58,6 +58,16 @@
         .review .rating {
             font-size: 1.2rem;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .review .rating-stars {
+            margin-left: 0.5rem;
+            display: flex;
+        }
+        .review .rating-stars i {
+            color: gold;
+            margin-right: 0.2rem;
         }
         .review .created-at {
             color: #888;
@@ -83,7 +93,7 @@
         if (movieId) {
             // 영화 정보 가져오기
             $.ajax({
-                url: '/movies/' + movieId,
+                url: '/movies/detail?id=' + movieId,
                 method: 'GET',
                 success: function(movie) {
                     var movieInfo = $('#movieInfo');
@@ -115,7 +125,15 @@
                                 let date = new Date(d.createdAt);
                                 let formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 ' + date.getHours() + '시 ' + date.getMinutes() + '분';
                                 s += '<div class="review">';
-                                s += '<div class="rating">평점: ' + d.rating + '</div>';
+                                s += '<div class="rating">평점: <div class="rating-stars">';
+                                for (let i = 1; i <= 10; i++) {
+                                    if (i <= d.rating) {
+                                        s += '<i class="fas fa-star"></i>';
+                                    } else {
+                                        s += '<i class="far fa-star"></i>';
+                                    }
+                                }
+                                s += '</div></div>';
                                 s += '<div class="review-text">' + d.review + '</div>';
                                 s += '<div class="created-at">' + formattedDate + '</div>';
                                 s += '</div>';
