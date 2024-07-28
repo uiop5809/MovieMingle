@@ -8,6 +8,7 @@ import com.spring.movie_mingle.dto.ReviewUpdateDto;
 import com.spring.movie_mingle.repository.MovieRepository;
 import com.spring.movie_mingle.repository.ReviewRepository;
 import com.spring.movie_mingle.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +28,11 @@ public class ReviewService {
         return reviewRepository.findByMovie(movie);
     }
 
-    public Long createReview(ReviewRequestDto reviewRequestDto) {
-        User user = userRepository.findById(reviewRequestDto.getUserId()).orElseThrow();
+    public Long createReview(ReviewRequestDto reviewRequestDto, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new IllegalStateException("로그인된 유저 정보가 없습니다.");
+        }
         Movie movie = movieRepository.findById(reviewRequestDto.getMovieId()).orElseThrow();
         Review review = new Review(user, movie, reviewRequestDto.getRating(), reviewRequestDto.getReview());
         reviewRepository.save(review);

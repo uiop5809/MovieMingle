@@ -54,6 +54,7 @@
             padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .review .rating {
             font-size: 1.2rem;
@@ -74,6 +75,120 @@
             font-size: 0.9rem;
             margin-top: 0.5rem;
         }
+        .review .user-name {
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        .review .edit-button, .review .save-button, .review .delete-button {
+            position: absolute;
+            top: 1rem;
+            background-color: #f0f0f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .review .edit-button {
+            right: 7rem; /* 위치 조정 */
+        }
+        .review .save-button {
+            right: 7rem; /* 위치 조정 */
+            display: none;
+        }
+        .review .delete-button {
+            right: 1rem; /* 위치 조정 */
+        }
+        .review .edit-button:hover, .review .save-button:hover, .review .delete-button:hover {
+            background-color: #ddd;
+        }
+        .review .review-text {
+            margin-top: 0.5rem;
+        }
+        .review .review-edit-form {
+            display: none;
+            flex-direction: column;
+            margin-top: 1rem;
+        }
+        .review .review-edit-form textarea, .review .review-edit-form input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .review.edit-mode .review-text {
+            display: none;
+        }
+        .review.edit-mode .review-edit-form {
+            display: flex;
+        }
+        .review.edit-mode .edit-button {
+            display: none;
+        }
+        .review.edit-mode .save-button {
+            display: block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 100px; /* 패딩 조정 */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 40px; /* 패딩 조정 */
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .modal-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .modal-buttons .confirm-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .modal-buttons .confirm-button:hover {
+            background-color: #d32f2f;
+        }
+        .modal-buttons .cancel-button {
+            background-color: #f0f0f0;
+        }
+        .modal-buttons .cancel-button:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 <body>
@@ -84,11 +199,24 @@
 <div id="movieInfo" class="movie-info"></div>
 <div id="reviewContainer" class="review-container"></div>
 
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>정말로 삭제하시겠습니까?</p>
+        <div class="modal-buttons">
+            <button class="confirm-button">삭제</button>
+            <button class="cancel-button">취소</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         var urlParams = new URLSearchParams(window.location.search);
         var movieId = urlParams.get('movieId');
+        var currentUserId = 'current_user_id'; // 여기에 현재 로그인한 사용자의 ID를 넣어주세요. 이 값은 서버에서 받아와야 합니다.
+        var deleteReviewId; // 삭제할 리뷰 ID
 
         if (movieId) {
             // 영화 정보 가져오기
@@ -125,7 +253,7 @@
                             if (d.movie.id == movieId) {
                                 let date = new Date(d.createdAt);
                                 let formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 ' + date.getHours() + '시 ' + date.getMinutes() + '분';
-                                s += '<div class="review">';
+                                s += '<div class="review" data-review-id="' + d.id + '">';
                                 s += '<div class="rating">평점: <div class="rating-stars">';
                                 for (let i = 1; i <= 10; i++) {
                                     if (i <= d.rating) {
@@ -136,7 +264,15 @@
                                 }
                                 s += '</div></div>';
                                 s += '<div class="review-text">' + d.review + '</div>';
+                                s += '<div class="review-edit-form">';
+                                s += '<textarea class="edit-review-text">' + d.review + '</textarea>';
+                                s += '<input type="number" class="edit-review-rating" value="' + d.rating + '" min="1" max="10">';
+                                s += '</div>';
                                 s += '<div class="created-at">' + formattedDate + '</div>';
+                                s += '<div class="user-name">' + d.user.name + '</div>'; // 유저 이름 추가
+                                s += '<button class="edit-button">수정</button>'; // 수정 버튼 추가
+                                s += '<button class="save-button" style="display:none;">저장</button>'; // 저장 버튼 추가
+                                s += '<button class="delete-button">삭제</button>'; // 삭제 버튼 추가
                                 s += '</div>';
                             }
                         });
@@ -144,13 +280,79 @@
                         s = "<p>No reviews found.</p>";
                     }
                     $("#reviewContainer").html(s);
+
+                    // 수정 버튼 클릭 이벤트 핸들러
+                    $('.edit-button').on('click', function() {
+                        var reviewElement = $(this).closest('.review');
+                        reviewElement.toggleClass('edit-mode');
+                        if (reviewElement.hasClass('edit-mode')) {
+                            $(this).next('.save-button').show();
+                            $(this).text('취소');
+                        } else {
+                            $(this).next('.save-button').hide();
+                            $(this).text('수정');
+                        }
+                    });
+
+                    // 저장 버튼 클릭 이벤트 핸들러
+                    $('.save-button').on('click', function() {
+                        var reviewElement = $(this).closest('.review');
+                        var reviewId = reviewElement.data('review-id');
+                        var updatedReview = {
+                            id: reviewId,
+                            rating: reviewElement.find('.edit-review-rating').val(),
+                            review: reviewElement.find('.edit-review-text').val()
+                        };
+
+                        $.ajax({
+                            url: '/review/update',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(updatedReview),
+                            success: function(response) {
+                                alert(response);
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("리뷰 업데이트 중 오류 발생:", status, error);
+                                alert("리뷰 업데이트 중 오류가 발생했습니다.");
+                            }
+                        });
+                    });
+
+                    // 삭제 버튼 클릭 이벤트 핸들러
+                    $('.delete-button').on('click', function() {
+                        deleteReviewId = $(this).closest('.review').data('review-id');
+                        $('#deleteModal').show();
+                    });
+
+                    // 모달 닫기 버튼 클릭 이벤트 핸들러
+                    $('.close, .cancel-button').on('click', function() {
+                        $('#deleteModal').hide();
+                    });
+
+                    // 삭제 확인 버튼 클릭 이벤트 핸들러
+                    $('.confirm-button').on('click', function() {
+                        $.ajax({
+                            url: '/review/delete?id=' + deleteReviewId,
+                            method: 'DELETE',
+                            success: function(response) {
+                                alert(response);
+                                location.reload();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("리뷰 삭제 중 오류 발생:", status, error);
+                                alert("리뷰 삭제 중 오류가 발생했습니다.");
+                            }
+                        });
+                    });
+
                 },
                 error: function(xhr, status, error) {
                     console.error("리뷰 요청 중 오류 발생:", status, error);
                     alert("리뷰 요청 중 오류가 발생했습니다.");
                 }
             });
-
 
             // 리뷰 등록 페이지로 이동할 때 movieId를 URL에 포함
             $('#writeReviewButton').attr('href', '/review/write.html?movieId=' + movieId);

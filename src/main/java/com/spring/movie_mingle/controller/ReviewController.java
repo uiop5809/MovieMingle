@@ -4,6 +4,7 @@ import com.spring.movie_mingle.domain.Review;
 import com.spring.movie_mingle.dto.ReviewRequestDto;
 import com.spring.movie_mingle.dto.ReviewUpdateDto;
 import com.spring.movie_mingle.service.ReviewService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,8 @@ public class ReviewController {
      * Review 생성
      */
     @PostMapping("/write")
-    public ResponseEntity<Long> createReview(@RequestBody ReviewRequestDto reviewRequestDto) {
-        return ResponseEntity.ok(reviewService.createReview(reviewRequestDto));
+    public ResponseEntity<Long> createReview(@RequestBody ReviewRequestDto reviewRequestDto, HttpSession session) {
+        return ResponseEntity.ok(reviewService.createReview(reviewRequestDto, session));
     }
 
     /**
