@@ -56,7 +56,7 @@
 <div class="container">
     <h1>로그인</h1>
     <form id="login_form" action="/user/login" method="post">
-        <input type="text" id="id" name="id" placeholder="아이디"> <br>
+        <input type="text" id="email" name="email" placeholder="이메일"> <br>
         <input type="password" id="password" name="password" placeholder="비밀번호"> <br>
         <input type="submit" value="로그인">
     </form>
@@ -69,7 +69,10 @@
         $.ajax({
             url: "/user/login",
             method: "POST",
-            data: $("#login_form").serialize(),
+            data: {
+                email: $("#email").val(),
+                password: $("#password").val()
+            },
             success: function(data) {
                 alert(data.code + ", " + data.message);
                 location.href = "/main.html";

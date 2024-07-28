@@ -114,14 +114,15 @@
 
             // 리뷰 목록 가져오기
             $.ajax({
-                url: '/review/list',
+                url: '/review/list?movieId=' + movieId,
                 method: 'GET',
                 data: { movieId: movieId },
                 success: function(data) {
+                    console.log("리뷰 데이터:", data); // 서버에서 반환한 데이터 확인
                     let s = "";
-                    if (data.data) {
-                        data.data.forEach(d => {
-                            if (d.movieId == movieId) {
+                    if (data.length) { // data가 배열인지 확인
+                        data.forEach(d => {
+                            if (d.movie.id == movieId) {
                                 let date = new Date(d.createdAt);
                                 let formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 ' + date.getHours() + '시 ' + date.getMinutes() + '분';
                                 s += '<div class="review">';
@@ -149,6 +150,7 @@
                     alert("리뷰 요청 중 오류가 발생했습니다.");
                 }
             });
+
 
             // 리뷰 등록 페이지로 이동할 때 movieId를 URL에 포함
             $('#writeReviewButton').attr('href', '/review/write.html?movieId=' + movieId);

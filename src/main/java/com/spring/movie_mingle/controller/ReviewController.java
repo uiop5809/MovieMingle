@@ -1,72 +1,51 @@
 package com.spring.movie_mingle.controller;
 
 import com.spring.movie_mingle.domain.Review;
-import com.spring.movie_mingle.repository.ReviewRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import com.spring.movie_mingle.dto.ReviewRequestDto;
+import com.spring.movie_mingle.dto.ReviewUpdateDto;
+import com.spring.movie_mingle.service.ReviewService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-@Controller
-@RequestMapping("review")
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/review")
 public class ReviewController {
 
-    @Autowired
-    private ReviewRepository reviewRepo;
+    private final ReviewService reviewService;
 
+    /**
+     * Review id별 조회
+     */
     @GetMapping("/list")
-    @ResponseBody
-    public Map<String, Object> list() {
-        Map<String, Object> result = new HashMap<>();
-        List<Review> list = reviewRepo.findAll();
-        result.put("code", "ok");
-        result.put("data", list);
-        return result;
+    public ResponseEntity<List<Review>> getReviewList(@RequestParam Long movieId) {
+        return ResponseEntity.ok(reviewService.findById(movieId));
     }
 
-    @GetMapping("/detail/{review_id}")
-    @ResponseBody
-    public Map<String, Object> detail(@PathVariable("review_id") int review_id) {
-        Map<String, Object> result = new HashMap<>();
-        Optional<Review> rv = reviewRepo.findById(review_id);
-        if(rv.isPresent()){
-            Review review = rv.get();
-            result.put("code", "ok");
-            result.put("data", review);
-        }
-        return result;
-    }
-
+    /**
+     * Review 생성
+     */
     @PostMapping("/write")
-    @ResponseBody
-    public Map<String, Object> regist(@RequestBody Review review){
-        Map<String, Object> result = new HashMap<>();
-        Date date = new java.util.Date();
-        review.setCreatedAt(date);
-        reviewRepo.save(review);
-        result.put("code", "ok");
-        return result;
+    public ResponseEntity<Long> createReview(@RequestBody ReviewRequestDto reviewRequestDto) {
+        return ResponseEntity.ok(reviewService.createReview(reviewRequestDto));
     }
 
+    /**
+     * Review 수정
+     */
     @PostMapping("/update")
-    @ResponseBody
-    public Map<String, Object> update(@RequestBody Review review) {
-        Map<String, Object> result = new HashMap<>();
-        Optional<Review> optionalReview = reviewRepo.findById(review.getReviewId());
-        if (optionalReview.isPresent()) {
-            Review existingReview = optionalReview.get();
-            existingReview.setMovieId(review.getMovieId());
-            existingReview.setMovieId(review.getUserId());
-            existingReview.setRating(review.getRating());
-            existingReview.setReview(review.getReview());
-            reviewRepo.save(existingReview);
-            result.put("code", "ok");
-        } else {
-            result.put("code", "error");
-            result.put("message", "Review not found");
-        }
-        return result;
+    public ResponseEntity<String> updateReview(@RequestBody ReviewUpdateDto reviewUpdateDto) {
+        return ResponseEntity.ok(reviewService.updateReview(reviewUpdateDto));
     }
 
+    /**
+     * Review 삭제
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteReview(@RequestParam Long id) {
+        return ResponseEntity.ok(reviewService.deleteReview(id));
+    }
 }

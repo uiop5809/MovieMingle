@@ -18,7 +18,7 @@ public class MovieController {
      * Movie DB 저장
      */
     @PostMapping("/movies/popular")
-    public ResponseEntity<Long> getPopularMovies() {
+    public ResponseEntity<String> getPopularMovies() {
         return ResponseEntity.ok(movieService.insertMovie());
     }
 
@@ -37,12 +37,4 @@ public class MovieController {
     public ResponseEntity<Movie> getMovieById(@RequestParam Long id) {
         return ResponseEntity.ok(movieService.findById(id));
     }
-
-    /**
-     * Movie 최신순 정렬
-     */
-
-    /**
-     * Movie 평점순 정렬
-     */
 }

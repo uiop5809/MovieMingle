@@ -1,7 +1,10 @@
 package com.spring.movie_mingle.domain;
 
+import com.spring.movie_mingle.dto.ReviewRequestDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
@@ -10,17 +13,19 @@ import java.util.Date;
 @Getter
 @Setter
 @Table(name = "review")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int reviewId;
+    private Long id;
 
-    @Column(nullable = false)
-    private int userId;
+    @ManyToOne
+    private User user;
 
-    @Column(nullable = false)
-    private int movieId;
+    @ManyToOne
+    private Movie movie;
 
     @Column(nullable = false)
     private int rating;
@@ -46,5 +51,17 @@ public class Review {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = new Date();
+    }
+
+    public Review(User user, Movie movie, int rating, String review) {
+        this.user = user;
+        this.movie = movie;
+        this.rating = rating;
+        this.review = review;
+    }
+
+    public void reviewUpdate (int rating, String review) {
+        this.rating = rating;
+        this.review = review;
     }
 }

@@ -139,7 +139,9 @@
     $(document).ready(function() {
         var urlParams = new URLSearchParams(window.location.search);
         var movieId = urlParams.get('movieId');
+
         if (movieId) {
+            movieId = Number(movieId); // movieId를 명시적으로 숫자로 변환
             $("#movie_id").val(movieId);
 
             // 영화 정보 가져오기
@@ -172,6 +174,7 @@
             });
         });
 
+        // 리뷰 등록하기
         $("#review_form").submit(function(e) {
             e.preventDefault();
             $.ajax({
@@ -185,12 +188,11 @@
                     review: $("#review").val()
                 }),
                 success: function(data) {
-                    if (data.code == "ok") {
-                        location.href = "/review/list.html?movieId=" + $("#movie_id").val();
-                    }
+                    window.location.href = '/review/list.html?movieId=' + movieId;
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error("Error: " + textStatus + ", " + errorThrown);
+                    alert("리뷰 등록 중 오류가 발생했습니다.");
                 }
             });
         });

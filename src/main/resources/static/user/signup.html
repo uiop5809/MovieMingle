@@ -47,7 +47,7 @@
 <div class="container">
     <h1>회원가입</h1>
     <form id="signup_form" action="/user/signup" method="post">
-        <input type="text" id="id" name="id" placeholder="아이디"> <br>
+        <input type="text" id="email" name="email" placeholder="이메일"> <br>
         <input type="password" id="password" name="password" placeholder="비밀번호"> <br>
         <input type="text" id="name" name="name" placeholder="이름"> <br>
         <input type="submit" value="회원가입">
@@ -60,10 +60,14 @@
         $.ajax({
             url: "/user/signup",
             method: "POST",
-            data: $("#signup_form").serialize(),
+            data: {
+                email: $("#email").val(),
+                password: $("#password").val(),
+                name: $("#name").val()
+            },
             success: function(data) {
                 alert(data.code + ", " + data.message);
-                location.href = "/login.html";
+                location.href = "/user/login.html";
             },
             error: function(xhr, status, error) {
                 console.error("회원가입 요청 중 오류 발생:", status, error);
