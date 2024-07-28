@@ -57,4 +57,13 @@ public class UserService {
         }
         return result;
     }
+
+    // 로그아웃
+    public Map<String, Object> logout(HttpSession session) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("code", "ok");
+        result.put("message", "로그아웃 완료");
+        session.invalidate();
+        return result;
+    }
 }

@@ -58,7 +58,7 @@
 </head>
 <body>
 <div class="navbar">
-    <a href="/user/login.html">로그인</a>
+    <a href="/user/login.html" id="authButton">로그인</a>
 </div>
 <h1>MovieMingle</h1>
 <p>영화와 함께하는 소셜 네트워킹, MovieMingle에서 시작해요!</p>
@@ -70,11 +70,45 @@
         // 페이지 로드 시 인기 영화 데이터 가져오기
         fetchData();
 
+        // 로그인 상태 확인 및 로그인/로그아웃 버튼 설정
+        checkLoginStatus();
+
+        function checkLoginStatus() {
+            $.ajax({
+                url: '/user/status',
+                method: 'GET',
+                success: function(data) {
+                    if (data.loggedIn) {
+                        $('#authButton').text('로그아웃').attr('href', '#').on('click', function(e) {
+                            e.preventDefault();
+                            logout();
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error checking login status:', status, error);
+                }
+            });
+        }
+
+        function logout() {
+            $.ajax({
+                url: '/user/logout',
+                method: 'POST',
+                success: function(response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error during logout:', status, error);
+                }
+            });
+        }
+
         // 데이터 가져오는 함수
         function fetchData() {
             $.ajax({
                 url: '/movies',
-
                 method: 'GET',
                 success: function(data) {
                     console.log(data); // 데이터가 올바르게 전달되는지 확인
